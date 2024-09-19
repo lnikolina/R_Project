@@ -40,3 +40,28 @@ prosjek_ometanja_ostali <- mean(ostali_korisnici$ometanje_numericko, na.rm = TRU
 # Ispis prosjeka ometanja za ostale korisnike
 print(prosjek_ometanja_ostali)
 
+
+
+#KREIRANJE PDF-a
+
+pdf("analiza_ometanja.pdf")
+print("Prosječna razina ometanja za korisnike društvenih mreža:")
+print(prosjek_ometanja)
+print("Prosječna razina ometanja za korisnike koji ne koriste društvene mreže:")
+print(prosjek_ometanja_ostali)
+dev.off()
+
+#KREIRANJE GRAFOVA
+grupe <- c("Društvene mreže", "Ostali korisnici")
+prosjek_ometanja_grupe <- c(prosjek_ometanja, prosjek_ometanja_ostali)
+
+barplot(prosjek_ometanja_grupe, names.arg = grupe, col = "pink", 
+        main = "Usporedba ometanja: Društvene mreže vs. Ostali korisnici", 
+        ylab = "Prosječna razina ometanja", ylim = c(0, 5))
+
+pdf("graf_ometanja_roze.pdf")
+barplot(prosjek_ometanja_grupe, names.arg = grupe, col = "pink", 
+        main = "Usporedba ometanja: Društvene mreže vs. Ostali korisnici", 
+        ylab = "Prosječna razina ometanja", ylim = c(0, 5))
+dev.off()
+
