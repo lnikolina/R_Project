@@ -65,3 +65,26 @@ barplot(prosjek_ometanja_grupe, names.arg = grupe, col = "pink",
         ylab = "Prosječna razina ometanja", ylim = c(0, 5))
 dev.off()
 
+
+
+
+# T-test za usporedbu ometanja između korisnika društvenih mreža i ostalih korisnika
+t_test_rezultat <- t.test(drustvene_mreze_korisnici$ometanje_numericko, 
+                          ostali_korisnici$ometanje_numericko, 
+                          alternative = "two.sided", var.equal = FALSE)
+
+# Ispis rezultata t-testa
+print(t_test_rezultat)
+
+
+
+#PDF T-TESTA
+
+pdf("t_test_rezultat.pdf")
+cat("T-test rezultati:\n\n")
+cat("t-statistika: ", t_test_rezultat$statistic, "\n")
+cat("Stupnjevi slobode: ", t_test_rezultat$parameter, "\n")
+cat("P-vrijednost: ", t_test_rezultat$p.value, "\n")
+cat("Interval povjerenja (95%): ", t_test_rezultat$conf.int[1], " do ", t_test_rezultat$conf.int[2], "\n")
+cat("Prosječna razina ometanja - Društvene mreže: ", t_test_rezultat$estimate[1], "\n")
+cat("Prosječna razina ometanja - Ostali korisnici: ", t_test_rezultat$estimate[2], "\n")
