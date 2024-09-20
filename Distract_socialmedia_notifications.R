@@ -1,7 +1,7 @@
 
 library(readxl)
 
-# Učitanje Excel datoteke
+#Excel datoteke
 file_path <- "/Users/nikolinalekaj/Library/Mobile Documents/com~apple~CloudDocs/FIPU/HCI/PROJEKT/HCI (Responses).xlsx"
 df <- read_excel(file_path)
 

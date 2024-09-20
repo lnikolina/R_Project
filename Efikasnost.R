@@ -26,3 +26,7 @@ positive_productivity_data <- positive_productivity_data %>%
 
 # View the transformed data again to check
 head(positive_productivity_data)
+
+
+
+#SEM PLS
