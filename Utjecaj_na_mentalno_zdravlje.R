@@ -1,13 +1,13 @@
+library(readxl)  # Učitaj biblioteku za čitanje Excel fajlova
+library(ggplot2)  # Učitaj biblioteku za pravljenje grafova
+library(dplyr)  # Učitaj biblioteku za manipulaciju podacima
+library(tidyr)  # Učitaj biblioteku za preuređivanje podataka
 
-library(readxl)
-library(ggplot2)
-library(dplyr)
-
+# Definiraj putanju do fajla
 file_path <- "/Users/nikolinalekaj/Library/Mobile Documents/com~apple~CloudDocs/FIPU/HCI/PROJEKT/HCI (Responses).xlsx"
-data <- read_excel(file_path)
+data <- read_excel(file_path)  # Učitaj podatke iz Excel fajla
 
-colnames(data)
-
+# Odaberi kolone koje su nam potrebne za analizu
 selected_columns <- c(
   "Utjecaj na mentalno zdravlje:\nOsjećate li povećanu anksioznost zbog stalnih obavijesti koje pristižu s Vašeg mobilnog uređaja?",
   "Koliko često provjeravate mobilne obavijesti tijekom dana?",
@@ -15,48 +15,25 @@ selected_columns <- c(
   "Opći utjecaj tehnologije:\nSmatrate li da bi Vaša produktivnost bila veća kada biste u potpunosti isključili obavijesti tijekom rada?"
 )
 
+# Odaberi samo te kolone iz skupa podataka
 filtered_data <- data[, selected_columns]
 
+# Konvertiraj sve kolone u karaktere da izbjegnemo grešku u pivot_longer()
+filtered_data <- filtered_data %>%
+  mutate(across(everything(), as.character))
 
-summary(filtered_data)
+# Sada trebamo preurediti podatke iz širokog formata u dugi format
+long_data <- filtered_data %>%
+  pivot_longer(
+    cols = everything(),  # Sve kolone prebacujemo u dva stupca: pitanje i odgovor
+    names_to = "Question",  # Kolona sa imenima pitanja
+    values_to = "Response"  # Kolona sa odgovorima
+  )
 
-# Plot 1: Impact on Mental Health - Anxiety
-ggplot(filtered_data, aes(x = `Utjecaj na mentalno zdravlje:\nOsjećate li povećanu anksioznost zbog stalnih obavijesti koje pristižu s Vašeg mobilnog uređaja?`)) +
-  geom_bar() +
-  labs(title = "Impact on Mental Health - Anxiety Due to Notifications", x = "Responses", y = "Number of Responses") +
-  theme_minimal()
-
-# Plot 2: How Often Do You Check Mobile Notifications?
-ggplot(filtered_data, aes(x = `Koliko često provjeravate mobilne obavijesti tijekom dana?`)) +
-  geom_bar() +
-  labs(title = "How Often Do You Check Mobile Notifications?", x = "Responses", y = "Number of Responses") +
-  theme_minimal()
-
-# Plot 3: General Attitude Towards Mobile Notifications
-ggplot(filtered_data, aes(x = `Kako biste opisali svoj opći stav prema mobilnim obavijestima?`)) +
-  geom_bar() +
-  labs(title = "General Attitude Towards Mobile Notifications", x = "Responses", y = "Number of Responses") +
-  theme_minimal()
-
-# Plot 4: General Technology Impact on Productivity
-ggplot(filtered_data, aes(x = `Opći utjecaj tehnologije:\nSmatrate li da bi Vaša produktivnost bila veća kada biste u potpunosti isključili obavijesti tijekom rada?`)) +
-  geom_bar() +
-  labs(title = "General Technology Impact on Productivity", x = "Responses", y = "Number of Responses") +
-  theme_minimal()
-
-
-
-
-# anova
-
-
-
-# "Koliko često provjeravate mobilne obavijesti" factor (independent variable)
-filtered_data$`Koliko često provjeravate mobilne obavijesti tijekom dana?` <- as.factor(filtered_data$`Koliko često provjeravate mobilne obavijesti tijekom dana?`)
-
-
-anova_result <- aov(`Utjecaj na mentalno zdravlje:\nOsjećate li povećanu anksioznost zbog stalnih obavijesti koje pristižu s Vašeg mobilnog uređaja?` ~ `Koliko često provjeravate mobilne obavijesti tijekom dana?`, data = filtered_data)
-
-summary(anova_result)
-
-summary(anova_result)
+# Pravim graf za sve četiri varijable odjednom
+ggplot(long_data, aes(x = Response)) +  # Definiram da želim brojati odgovore
+  geom_bar() +  # Koristim bar chart (stupce)
+  facet_wrap(~ Question, scales = "free_x") +  # Dijelim graf u četiri manja grafika, svaki za jedno pitanje
+  labs(title = "Analysis of Mobile Notifications Impact", x = "Responses", y = "Number of Responses") +  # Dodajem naslove i imenujem osi
+  theme_minimal() +  # Koristim minimalistički stil grafika
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotiram tekst na x-osi da se odgovori bolje vide
