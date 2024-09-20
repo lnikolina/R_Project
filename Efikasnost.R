@@ -31,7 +31,7 @@ positive_productivity_data_new <- positive_productivity_data_new %>%
 
 #uvid
 head(positive_productivity_data_new)  # Prikazuje prvih nekoliko redova u konzoli
-View(positive_productivity_data_new)  # Otvara podatke u novom prozoru
+#View(positive_productivity_data_new)  # Otvara podatke u novom prozoru
 
 write.csv(positive_productivity_data_new, "positive_productivity_data_new.csv", row.names = FALSE)
 
@@ -75,46 +75,22 @@ ggplot(positive_productivity_long, aes(x = Vrijednosti, fill = Varijabla)) +
 
 
 
-#SEM PLS
-library(plspm)
-
-# Definiramo unutarnji model (ovdje nema odnosa među konstruktorima)
-productivity_path <- matrix(c(0, 0, 0, 0,  # redak za prvu latentnu varijablu
-                              0, 0, 0, 0,  # redak za drugu latentnu varijablu
-                              0, 0, 0, 0,  # redak za treću latentnu varijablu
-                              0, 0, 0, 0), # redak za četvrtu latentnu varijablu
-                            nrow = 4, ncol = 4, byrow = TRUE)
-
-# Definiramo vanjski model - svaki konstruktor ima svoje indikatore
-outer_model <- list(
-  c("Pomažu_obavljanju_zadataka"),
-  c("Korisne_svakodnevni_zadaci"),
-  c("Pomažu_ostati_u_toku"),
-  c("Bitno_za_obavijesti_privatni_zivot")
-)
-
-# Definiramo reflektivne modele za sve latentne varijable
-modes <- c("A", "A", "A", "A")
+#T-TEST
 
 
-#NA ERROR
+# Imena varijabli za t-test
+variables <- c("Pomažu_obavljanju_zadataka", "Korisne_svakodnevni_zadaci", 
+               "Pomažu_ostati_u_toku", "Bitno_za_obavijesti_privatni_zivot")
 
-# Zamjena Likertove skale vrijednostima 1-5 s dodatnim .default za sve ostalo
-positive_productivity_data_new <- positive_productivity_data_new %>%
-  mutate(across(everything(), ~ recode(.,
-                                       "Potpuno se ne slažem" = 1,
-                                       "Ne slažem se" = 2,
-                                       "Nisam siguran/a" = 3,
-                                       "Slažem se" = 4,
-                                       "Potpuno se slažem" = 5,
-                                       .default = NA_real_)))  # Dodan .default
-
-# Uklanjanje redova s NA vrijednostima
-positive_productivity_data_clean <- na.omit(positive_productivity_data_new)
-
-# Pokretanje PLS modela s očišćenim podacima
-productivity_pls <- plspm(positive_productivity_data_clean, productivity_path, outer_model, modes)
-
-# Prikaz rezultata modela
-summary(productivity_pls)
+# Izvođenje t-testa za svaku varijablu
+for (var in variables) {
+  agree_group <- positive_productivity_data_new[[var]] %in% c(4, 5)
+  disagree_group <- positive_productivity_data_new[[var]] %in% c(1, 2)
+  
+  t_test_result <- t.test(agree_group, disagree_group)
+  
+  # Prikaz rezultata za svaku varijablu
+  print(paste("T-test za varijablu:", var))
+  print(t_test_result)
+}
 
