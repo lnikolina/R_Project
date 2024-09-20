@@ -72,3 +72,49 @@ ggplot(positive_productivity_long, aes(x = Vrijednosti, fill = Varijabla)) +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotiranje osi x ako ima puno varijabli
 
+
+
+
+#SEM PLS
+library(plspm)
+
+# Definiramo unutarnji model (ovdje nema odnosa među konstruktorima)
+productivity_path <- matrix(c(0, 0, 0, 0,  # redak za prvu latentnu varijablu
+                              0, 0, 0, 0,  # redak za drugu latentnu varijablu
+                              0, 0, 0, 0,  # redak za treću latentnu varijablu
+                              0, 0, 0, 0), # redak za četvrtu latentnu varijablu
+                            nrow = 4, ncol = 4, byrow = TRUE)
+
+# Definiramo vanjski model - svaki konstruktor ima svoje indikatore
+outer_model <- list(
+  c("Pomažu_obavljanju_zadataka"),
+  c("Korisne_svakodnevni_zadaci"),
+  c("Pomažu_ostati_u_toku"),
+  c("Bitno_za_obavijesti_privatni_zivot")
+)
+
+# Definiramo reflektivne modele za sve latentne varijable
+modes <- c("A", "A", "A", "A")
+
+
+#NA ERROR
+
+# Zamjena Likertove skale vrijednostima 1-5 s dodatnim .default za sve ostalo
+positive_productivity_data_new <- positive_productivity_data_new %>%
+  mutate(across(everything(), ~ recode(.,
+                                       "Potpuno se ne slažem" = 1,
+                                       "Ne slažem se" = 2,
+                                       "Nisam siguran/a" = 3,
+                                       "Slažem se" = 4,
+                                       "Potpuno se slažem" = 5,
+                                       .default = NA_real_)))  # Dodan .default
+
+# Uklanjanje redova s NA vrijednostima
+positive_productivity_data_clean <- na.omit(positive_productivity_data_new)
+
+# Pokretanje PLS modela s očišćenim podacima
+productivity_pls <- plspm(positive_productivity_data_clean, productivity_path, outer_model, modes)
+
+# Prikaz rezultata modela
+summary(productivity_pls)
+
