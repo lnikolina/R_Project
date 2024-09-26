@@ -23,24 +23,24 @@ table(data$Distrakcija_Numeric)
 
 # Uspoređivanje korisnika društvenih mreža s ostalim korisnicima
 social_media_users <- data$Distrakcija_Numeric[data$Koje.aplikacije.najčešće.koristite.na.svom.pametnom.telefonu...Možete.odabrati.više.odgovora.. == "Društvene mreže (Facebook, Instagram, Twitter, itd.)"]
-other_users <- data$Distrakcija_Numeric[data$Koje.aplikacije.najčešće.koristite.na.svom.pametnom.telefonu...Možete.odabrati.više.odgovora.. != "Društvene mreže (Facebook, Instagram, Twitter, itd.)"]
+other_app_users <- data$Distrakcija_Numeric[data$Koje.aplikacije.najčešće.koristite.na.svom.pametnom.telefonu...Možete.odabrati.više.odgovora.. != "Društvene mreže (Facebook, Instagram, Twitter, itd.)"]
 
 # Mann-Whitney U test
-wilcox.test(social_media_users, other_users, alternative = "two.sided")
+wilcox.test(social_media_users, other_app_users, alternative = "two.sided")
 
 colnames(data)
 
 
 # Stvaranje grupa na temelju korištenih aplikacija
 social_media_users <- data$Distrakcija_Numeric[data$Koje.aplikacije.najčešće.koristite.na.svom.pametnom.telefonu...Možete.odabrati.više.odgovora.. == "Društvene mreže (Facebook, Instagram, Twitter, itd.)"]
-other_users <- data$Distrakcija_Numeric[data$Koje.aplikacije.najčešće.koristite.na.svom.pametnom.telefonu...Možete.odabrati.više.odgovora.. != "Društvene mreže (Facebook, Instagram, Twitter, itd.)"]
+other_app_users <- data$Distrakcija_Numeric[data$Koje.aplikacije.najčešće.koristite.na.svom.pametnom.telefonu...Možete.odabrati.više.odgovora.. != "Društvene mreže (Facebook, Instagram, Twitter, itd.)"]
 
 # Vizualizacija razine distrakcije između korisnika društvenih mreža i ostalih korisnika
 boxplot(Distrakcija ~ Korisnici, 
         data = data.frame(Korisnici = c(rep("Social Media Users", length(social_media_users)), 
                                         rep("Other Users", length(other_users))),
                           Distrakcija = c(social_media_users, other_users)),
-        main = "Distraction Level: Social Media Users vs. Other Users",
+        main = "Distraction Level: Social Media Users vs. Other App Users",
         ylab = "Distraction Level (1 - Strongly Disagree, 5 - Strongly Agree)",
         xlab = "Users",
         col = c("lightblue", "pink"))
